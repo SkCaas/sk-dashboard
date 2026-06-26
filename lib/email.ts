@@ -1,4 +1,7 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY!
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
+const SENDER_EMAIL = process.env.SENDER_EMAIL!
+const RESEND_API_URL = process.env.RESEND_API_URL!
 
 interface EmailParams {
   to: string
@@ -7,14 +10,14 @@ interface EmailParams {
 }
 
 export async function sendEmail({ to, subject, html }: EmailParams) {
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch(RESEND_API_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: 'SK Platform <onboarding@resend.dev>',
+      from: SENDER_EMAIL,
       to,
       subject,
       html
@@ -34,7 +37,7 @@ export function emailFacturaNueva(data: {
     to: data.corporativo_email,
     subject: `Nueva factura de ${data.proveedor_name} — ${data.moneda} ${data.monto.toLocaleString()}`,
     html: `
-      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="font-family: 'Google Sans', sans-serif; max-width: 560px; margin: 0 auto;">
         <div style="background: #000; padding: 32px 40px;">
           <span style="color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">SK · Smart Kapital</span>
         </div>
@@ -56,7 +59,7 @@ export function emailFacturaNueva(data: {
               <td style="padding: 12px 0; font-size: 20px; font-weight: 700; color: #000; text-align: right;">${data.moneda} ${data.monto.toLocaleString()}</td>
             </tr>
           </table>
-          <a href="https://scf-latam.vercel.app/facturas" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Revisar factura →</a>
+          <a href="${SITE_URL}/facturas" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Revisar factura →</a>
         </div>
         <div style="padding: 24px 40px; border-top: 1px solid #E0E0E0;">
           <p style="font-size: 11px; color: #C0C0C0;">© 2026 Smart Kapital · SK Credit Infrastructure · LATAM</p>
@@ -77,7 +80,7 @@ export function emailFacturaAprobada(data: {
     to: data.proveedor_email,
     subject: `Tu factura ${data.numero_factura} fue aprobada`,
     html: `
-      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="font-family: 'Google Sans', sans-serif; max-width: 560px; margin: 0 auto;">
         <div style="background: #000; padding: 32px 40px;">
           <span style="color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">SK · Smart Kapital</span>
         </div>
@@ -99,7 +102,7 @@ export function emailFacturaAprobada(data: {
               <td style="padding: 12px 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #000; text-align: right;">APROBADA</td>
             </tr>
           </table>
-          <a href="https://scf-latam.vercel.app/facturas" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Ver mis facturas →</a>
+          <a href="${SITE_URL}/facturas" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Ver mis facturas →</a>
         </div>
         <div style="padding: 24px 40px; border-top: 1px solid #E0E0E0;">
           <p style="font-size: 11px; color: #C0C0C0;">© 2026 Smart Kapital · SK Credit Infrastructure · LATAM</p>
@@ -119,7 +122,7 @@ export function emailFacturaRechazada(data: {
     to: data.proveedor_email,
     subject: `Tu factura ${data.numero_factura} fue rechazada`,
     html: `
-      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="font-family: 'Google Sans', sans-serif; max-width: 560px; margin: 0 auto;">
         <div style="background: #000; padding: 32px 40px;">
           <span style="color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">SK · Smart Kapital</span>
         </div>
@@ -137,7 +140,7 @@ export function emailFacturaRechazada(data: {
               <td style="padding: 12px 0; font-size: 20px; font-weight: 700; color: #000; text-align: right;">${data.moneda} ${data.monto.toLocaleString()}</td>
             </tr>
           </table>
-          <a href="https://scf-latam.vercel.app/facturas" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Ver mis facturas →</a>
+          <a href="${SITE_URL}/facturas" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Ver mis facturas →</a>
         </div>
         <div style="padding: 24px 40px; border-top: 1px solid #E0E0E0;">
           <p style="font-size: 11px; color: #C0C0C0;">© 2026 Smart Kapital · SK Credit Infrastructure · LATAM</p>
@@ -157,7 +160,7 @@ export function emailCreditoAprobado(data: {
     to: data.proveedor_email,
     subject: `Tu línea de crédito SK está activa — USD ${data.total_limit.toLocaleString()}`,
     html: `
-      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="font-family: 'Google Sans', sans-serif; max-width: 560px; margin: 0 auto;">
         <div style="background: #000; padding: 32px 40px;">
           <span style="color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">SK · Smart Kapital</span>
         </div>
@@ -183,7 +186,7 @@ export function emailCreditoAprobado(data: {
               <td style="padding: 12px 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #000; text-align: right;">ACTIVA</td>
             </tr>
           </table>
-          <a href="https://scf-latam.vercel.app/dashboard" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Ver mi dashboard →</a>
+          <a href="${SITE_URL}/dashboard" style="display: inline-block; background: #000; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none;">Ver mi dashboard →</a>
         </div>
         <div style="padding: 24px 40px; border-top: 1px solid #E0E0E0;">
           <p style="font-size: 11px; color: #C0C0C0;">© 2026 Smart Kapital · SK Credit Infrastructure · LATAM</p>
