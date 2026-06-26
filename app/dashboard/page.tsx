@@ -1,4 +1,5 @@
 'use client'
+import Logo from '../../components/Logo';
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -27,7 +28,7 @@ export default function DashboardPage() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Lexend Deca', sans-serif" }}>
       <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
     </div>
   )
@@ -67,30 +68,29 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F5F3', fontFamily: "'DM Sans', sans-serif", color: '#000' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+    <div style={{ minHeight: '100vh', background: '#F5F5F3', fontFamily: "'Google Sans', sans-serif", color: '#000' }}>
+      
       <header style={{ borderBottom: '1px solid #E0E0E0', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: '#000' }}>
-            <div style={{ width: 32, height: 32, border: '1.5px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 13 }}>SK</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 3, textTransform: 'uppercase' }}>Smart Kapital</span>
+          <Link href={process.env.NEXT_PUBLIC_LANDING_URL || "/"} style={{ textDecoration: 'none' }}>
+            <Logo />
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
             <span style={{ fontSize: 12, color: '#909090' }}>{profile?.company_name}</span>
             <span style={{ fontSize: 10, letterSpacing: 1.5, border: '1px solid #E0E0E0', color: '#909090', padding: '4px 10px', textTransform: 'uppercase' }}>{profile?.role}</span>
-            <button onClick={handleLogout} style={{ fontSize: 11, color: '#909090', letterSpacing: 1.5, textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>Salir</button>
+            <button onClick={handleLogout} style={{ fontSize: 11, color: '#909090', letterSpacing: 1.5, textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>Salir</button>
           </div>
         </div>
       </header>
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 40px' }}>
         <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090', marginBottom: 12 }}>Dashboard</div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 48 }}>
+        <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 48 }}>
           {isBanco ? 'Portal Banco' : isCorporativo ? 'Panel Corporativo' : 'Panel Proveedor'}
         </h1>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: '#E0E0E0', border: '1px solid #E0E0E0', marginBottom: 48 }}>
           {stats.map(s => (
             <div key={s.lbl} style={{ padding: '32px 28px', background: '#fff' }}>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 6 }}>{s.val}</div>
+              <div style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 6 }}>{s.val}</div>
               <div style={{ fontSize: 11, color: '#909090', letterSpacing: 1, textTransform: 'uppercase' }}>{s.lbl}</div>
             </div>
           ))}
@@ -98,8 +98,8 @@ export default function DashboardPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: '#E0E0E0', border: '1px solid #E0E0E0', marginBottom: 48 }}>
           {modules.map(m => (
             <Link key={m.num} href={m.href} style={{ padding: '40px 36px', background: '#fff', textDecoration: 'none', color: '#000', display: 'block' }}>
-              <div style={{ fontSize: 11, color: '#C0C0C0', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>{m.num} —</div>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: -0.5, marginBottom: 8 }}>{m.title}</div>
+              <div style={{ fontSize: 11, color: '#C0C0C0', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 16, fontFamily: "'Google Sans', sans-serif" }}>{m.num} —</div>
+              <div style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: -0.5, marginBottom: 8 }}>{m.title}</div>
               <div style={{ fontSize: 13, color: '#909090', lineHeight: 1.7 }}>{m.desc}</div>
               <div style={{ marginTop: 24, fontSize: 11, color: '#C0C0C0', letterSpacing: 1.5, textTransform: 'uppercase' }}>Abrir →</div>
             </Link>
@@ -129,9 +129,9 @@ export default function DashboardPage() {
               <tbody>
                 {facturas.map(f => (
                   <tr key={f.id} style={{ borderBottom: '1px solid #F5F5F3' }}>
-                    <td style={{ padding: '16px 32px', fontSize: 14, fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{f.numero_factura}</td>
+                    <td style={{ padding: '16px 32px', fontSize: 14, fontFamily: "'Google Sans', sans-serif", fontWeight: 700 }}>{f.numero_factura}</td>
                     <td style={{ padding: '16px 32px', fontSize: 13, color: '#606060' }}>{f.emisor}</td>
-                    <td style={{ padding: '16px 32px', fontSize: 13, fontFamily: 'monospace' }}>{f.moneda} {Number(f.monto).toLocaleString()}</td>
+                    <td style={{ padding: '16px 32px', fontSize: 13, fontFamily: "'Google Sans', sans-serif" }}>{f.moneda} {Number(f.monto).toLocaleString()}</td>
                     <td style={{ padding: '16px 32px' }}>
                       <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: f.estado === 'PENDIENTE' ? '#909090' : f.estado === 'APROBADA' ? '#000' : '#C0C0C0', border: '1px solid #E0E0E0', padding: '3px 8px' }}>{f.estado}</span>
                     </td>

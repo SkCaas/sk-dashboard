@@ -1,4 +1,5 @@
 'use client'
+import Logo from '../../components/Logo';
 import { useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -228,14 +229,13 @@ export default function DocsPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'DM Sans', sans-serif", color: '#000', display: 'flex', flexDirection: 'column' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Google Sans', sans-serif", color: '#000', display: 'flex', flexDirection: 'column' }}>
+      
 
       <header style={{ borderBottom: '1px solid #E0E0E0', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: '#000' }}>
-            <div style={{ width: 32, height: 32, border: '1.5px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 13 }}>SK</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 3, textTransform: 'uppercase' }}>API Reference</span>
+          <Link href={process.env.NEXT_PUBLIC_LANDING_URL || "/"} style={{ textDecoration: 'none' }}>
+            <Logo text="API Reference" />
           </Link>
           <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
             <span style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#909090', border: '1px solid #E0E0E0', padding: '4px 10px' }}>v1.0 · Sandbox</span>
@@ -254,9 +254,9 @@ export default function DocsPage() {
             <button key={ep.id} onClick={() => { setActive(ep.id); setResponse(null) }}
               style={{ width: '100%', padding: '16px 28px', background: active === ep.id ? '#1A1A1A' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', borderLeft: active === ep.id ? '2px solid #fff' : '2px solid transparent', transition: 'all 0.15s' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 10, letterSpacing: 1, fontFamily: 'monospace', color: active === ep.id ? '#fff' : '#404040', fontWeight: 600 }}>{ep.method}</span>
+                <span style={{ fontSize: 10, letterSpacing: 1, fontFamily: "'Google Sans', sans-serif", color: active === ep.id ? '#fff' : '#404040', fontWeight: 600 }}>{ep.method}</span>
               </div>
-              <p style={{ fontSize: 12, color: active === ep.id ? '#fff' : '#606060', fontFamily: 'monospace' }}>{ep.path.replace('/:id', '/{id}')}</p>
+              <p style={{ fontSize: 12, color: active === ep.id ? '#fff' : '#606060', fontFamily: "'Google Sans', sans-serif" }}>{ep.path.replace('/:id', '/{id}')}</p>
             </button>
           ))}
           <div style={{ padding: '32px 28px 0', borderTop: '1px solid #1A1A1A', marginTop: 32 }}>
@@ -268,36 +268,36 @@ export default function DocsPage() {
         <main style={{ flex: 1, padding: '60px 64px', maxWidth: 900 }}>
           <div style={{ marginBottom: 48 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, letterSpacing: 2, fontFamily: 'monospace', fontWeight: 700, border: '1px solid #000', padding: '4px 10px' }}>{endpoint.method}</span>
-              <code style={{ fontSize: 16, fontFamily: 'monospace', color: '#000' }}>{endpoint.path}</code>
+              <span style={{ fontSize: 11, letterSpacing: 2, fontFamily: "'Google Sans', sans-serif", fontWeight: 700, border: '1px solid #000', padding: '4px 10px' }}>{endpoint.method}</span>
+              <code style={{ fontSize: 16, fontFamily: "'Google Sans', sans-serif", color: '#000' }}>{endpoint.path}</code>
               <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', background: '#000', color: '#fff', padding: '3px 8px' }}>LIVE</span>
             </div>
-            <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 16 }}>{endpoint.title}</h1>
+            <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 16 }}>{endpoint.title}</h1>
             <p style={{ fontSize: 15, color: '#606060', lineHeight: 1.8, maxWidth: 600 }}>{endpoint.description}</p>
           </div>
 
           <div style={{ marginBottom: 40 }}>
             <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#909090', marginBottom: 16 }}>Request</p>
             <div style={{ background: '#0D0D0D', padding: 24 }}>
-              <pre style={{ fontFamily: 'monospace', fontSize: 13, color: '#B8B8B8', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>{endpoint.requestExample}</pre>
+              <pre style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 13, color: '#B8B8B8', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>{endpoint.requestExample}</pre>
             </div>
           </div>
 
           <div style={{ marginBottom: 40 }}>
             <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#909090', marginBottom: 16 }}>Response example</p>
             <div style={{ background: '#0D0D0D', padding: 24 }}>
-              <pre style={{ fontFamily: 'monospace', fontSize: 13, color: '#B8B8B8', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>{endpoint.responseExample}</pre>
+              <pre style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 13, color: '#B8B8B8', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>{endpoint.responseExample}</pre>
             </div>
           </div>
 
           <div style={{ borderTop: '1px solid #E0E0E0', paddingTop: 40 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#909090' }}>Try it — Sandbox</p>
-              {response?._time && <span style={{ fontSize: 11, color: '#C0C0C0', fontFamily: 'monospace' }}>{response._time}ms</span>}
+              {response?._time && <span style={{ fontSize: 11, color: '#C0C0C0', fontFamily: "'Google Sans', sans-serif" }}>{response._time}ms</span>}
             </div>
 
             <button onClick={handleTryIt} disabled={running}
-              style={{ background: running ? '#E0E0E0' : '#000', color: running ? '#909090' : '#fff', padding: '12px 32px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: running ? 'not-allowed' : 'pointer', fontFamily: "'DM Sans', sans-serif", marginBottom: 24 }}>
+              style={{ background: running ? '#E0E0E0' : '#000', color: running ? '#909090' : '#fff', padding: '12px 32px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: running ? 'not-allowed' : 'pointer', fontFamily: "'Google Sans', sans-serif", marginBottom: 24 }}>
               {running ? 'Running...' : `Run ${endpoint.method} request`}
             </button>
 
@@ -307,9 +307,9 @@ export default function DocsPage() {
                   <span style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: response.error ? '#CC0000' : '#10b981' }}>
                     {response.error ? 'ERROR' : '200 OK'}
                   </span>
-                  {response._time && <span style={{ fontSize: 11, color: '#404040', fontFamily: 'monospace' }}>{response._time}ms</span>}
+                  {response._time && <span style={{ fontSize: 11, color: '#404040', fontFamily: "'Google Sans', sans-serif" }}>{response._time}ms</span>}
                 </div>
-                <pre style={{ fontFamily: 'monospace', fontSize: 13, color: response.error ? '#FF6666' : '#B8B8B8', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>
+                <pre style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 13, color: response.error ? '#FF6666' : '#B8B8B8', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap' }}>
                   {JSON.stringify(response.error ? { error: response.error } : (({ _time, ...rest }) => rest)(response), null, 2)}
                 </pre>
               </div>

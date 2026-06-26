@@ -1,15 +1,16 @@
 'use client'
+import Logo from '../../components/Logo';
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 const S = {
-  page: { minHeight: '100vh', background: '#F5F5F3', fontFamily: "'DM Sans', sans-serif", color: '#000' },
+  page: { minHeight: '100vh', background: '#F5F5F3', fontFamily: "'Google Sans', sans-serif", color: '#000' },
   header: { borderBottom: '1px solid #E0E0E0', background: '#fff', position: 'sticky' as const, top: 0, zIndex: 100 },
   headerInner: { maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   main: { maxWidth: 1200, margin: '0 auto', padding: '60px 40px' },
   label: { display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase' as const, color: '#909090', marginBottom: 8 },
-  input: { width: '100%', background: '#fff', border: '1px solid #E0E0E0', color: '#000', padding: '12px 16px', fontSize: 14, outline: 'none', fontFamily: "'DM Sans', sans-serif" },
+  input: { width: '100%', background: '#fff', border: '1px solid #E0E0E0', color: '#000', padding: '12px 16px', fontSize: 14, outline: 'none', fontFamily: "'Google Sans', sans-serif" },
   card: { background: '#fff', border: '1px solid #E0E0E0', padding: 40 },
 }
 
@@ -46,13 +47,12 @@ export default function ScoringPage() {
 
   return (
     <div style={S.page}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+      
       <header style={S.header}>
         <div style={S.headerInner}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: '#000' }}>
-            <div style={{ width: 32, height: 32, border: '1.5px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 13 }}>SK</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 3, textTransform: 'uppercase' }}>Smart Kapital</span>
-          </Link>
+          <a href={process.env.NEXT_PUBLIC_LANDING_URL || "/"} style={{ textDecoration: 'none' }}>
+            <Logo />
+          </a>
           <div style={{ display: 'flex', gap: 24 }}>
             <Link href="/banco" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>Portal Banco</Link>
             <Link href="/dashboard" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>Dashboard</Link>
@@ -61,11 +61,11 @@ export default function ScoringPage() {
       </header>
       <main style={S.main}>
         <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090', marginBottom: 12 }}>Sprint 1 — Scoring Engine</div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 8 }}>Evaluación crediticia</h1>
+        <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 8 }}>Evaluación crediticia</h1>
         <p style={{ fontSize: 14, color: '#909090', marginBottom: 48 }}>Motor de reglas en tiempo real · 4 variables · menos de 500ms</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: '#E0E0E0', border: '1px solid #E0E0E0' }}>
           <div style={S.card}>
-            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 28, fontFamily: "'Syne', sans-serif" }}>01 — Nueva solicitud</div>
+            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 28, fontFamily: "'Google Sans', sans-serif" }}>01 — Nueva solicitud</div>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {error && <div style={{ background: '#FFF5F5', border: '1px solid #FFE0E0', color: '#CC0000', padding: '12px 16px', fontSize: 13 }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -87,13 +87,13 @@ export default function ScoringPage() {
                   <span>Malo (0)</span><span>Excelente (100)</span>
                 </div>
               </div>
-              <button type="submit" disabled={loading} style={{ background: loading ? '#E0E0E0' : '#000', color: loading ? '#909090' : '#fff', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+              <button type="submit" disabled={loading} style={{ background: loading ? '#E0E0E0' : '#000', color: loading ? '#909090' : '#fff', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
                 {loading ? 'Evaluando...' : 'Evaluar solicitud'}
               </button>
             </form>
           </div>
           <div style={S.card}>
-            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 28, fontFamily: "'Syne', sans-serif" }}>02 — Resultado</div>
+            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 28, fontFamily: "'Google Sans', sans-serif" }}>02 — Resultado</div>
             {!result && !loading && <div style={{ padding: '80px 0', textAlign: 'center' }}><div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#E0E0E0' }}>Completá el formulario</div></div>}
             {loading && <div style={{ padding: '80px 0', textAlign: 'center' }}><div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#C0C0C0' }}>Procesando...</div></div>}
             {result && (
@@ -106,7 +106,7 @@ export default function ScoringPage() {
                       <circle cx="80" cy="80" r="60" fill="none" stroke={getColor(result.recommendation)} strokeWidth="8" strokeDasharray={`${(result.score / 100) * 376} 376`} strokeLinecap="round" transform="rotate(-90 80 80)"/>
                     </svg>
                     <div style={{ position: 'absolute', textAlign: 'center' }}>
-                      <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 40, fontWeight: 700, color: '#000', lineHeight: 1 }}>{result.score}</div>
+                      <div style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 40, fontWeight: 700, color: '#000', lineHeight: 1 }}>{result.score}</div>
                       <div style={{ fontSize: 11, color: '#909090' }}>/100</div>
                     </div>
                   </div>
@@ -120,7 +120,7 @@ export default function ScoringPage() {
                     <div key={item.label}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 8 }}>
                         <span style={{ color: '#909090', letterSpacing: 1, textTransform: 'uppercase' }}>{item.label}</span>
-                        <span style={{ color: '#000', fontFamily: 'monospace', fontWeight: 500 }}>{item.score}/{item.max}</span>
+                        <span style={{ color: '#000', fontFamily: "'Google Sans', sans-serif", fontWeight: 500 }}>{item.score}/{item.max}</span>
                       </div>
                       <div style={{ width: '100%', background: '#F0F0F0', height: 2 }}>
                         <div style={{ height: 2, background: '#000', width: `${(item.score / item.max) * 100}%`, transition: 'width 1s ease' }} />

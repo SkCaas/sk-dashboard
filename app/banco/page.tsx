@@ -1,15 +1,16 @@
 'use client'
+import Logo from '../../components/Logo';
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 const S = {
-  page: { minHeight: '100vh', background: '#F5F5F3', fontFamily: "'DM Sans', sans-serif", color: '#000' },
+  page: { minHeight: '100vh', background: '#F5F5F3', fontFamily: "'Google Sans', sans-serif", color: '#000' },
   header: { borderBottom: '1px solid #E0E0E0', background: '#fff', position: 'sticky' as const, top: 0, zIndex: 100 },
   headerInner: { maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   main: { maxWidth: 1200, margin: '0 auto', padding: '60px 40px' },
   label: { display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase' as const, color: '#909090', marginBottom: 8 },
-  input: { width: '100%', background: '#fff', border: '1px solid #E0E0E0', color: '#000', padding: '12px 16px', fontSize: 14, outline: 'none', fontFamily: "'DM Sans', sans-serif" },
+  input: { width: '100%', background: '#fff', border: '1px solid #E0E0E0', color: '#000', padding: '12px 16px', fontSize: 14, outline: 'none', fontFamily: "'Google Sans', sans-serif" },
   card: { background: '#fff', border: '1px solid #E0E0E0', padding: 40 },
 }
 
@@ -78,12 +79,11 @@ export default function BancoPage() {
 
   return (
     <div style={S.page}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+      
       <header style={S.header}>
         <div style={S.headerInner}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: '#000' }}>
-            <div style={{ width: 32, height: 32, border: '1.5px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 13 }}>SK</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 3, textTransform: 'uppercase' }}>Smart Kapital</span>
+          <Link href={process.env.NEXT_PUBLIC_LANDING_URL || "/"} style={{ textDecoration: 'none' }}>
+            <Logo />
           </Link>
           <div style={{ display: 'flex', gap: 24 }}>
             <Link href="/scoring" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>Scoring</Link>
@@ -93,7 +93,7 @@ export default function BancoPage() {
       </header>
       <main style={S.main}>
         <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090', marginBottom: 12 }}>Sprint 2 — Decision Engine</div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 8 }}>Portal de decisiones</h1>
+        <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 8 }}>Portal de decisiones</h1>
         <p style={{ fontSize: 14, color: '#909090', marginBottom: 48 }}>Revisá solicitudes, analizá el score y tomá decisiones de credito</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 1, background: '#E0E0E0', border: '1px solid #E0E0E0', marginBottom: 48 }}>
           {[
@@ -104,14 +104,14 @@ export default function BancoPage() {
             { val: `$${(stats.volume/1000).toFixed(0)}K`, lbl: 'Volumen' },
           ].map(s => (
             <div key={s.lbl} style={{ padding: '28px 24px', background: '#fff' }}>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 6 }}>{s.val}</div>
+              <div style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 6 }}>{s.val}</div>
               <div style={{ fontSize: 11, color: '#909090', letterSpacing: 1, textTransform: 'uppercase' }}>{s.lbl}</div>
             </div>
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: '#E0E0E0', border: '1px solid #E0E0E0' }}>
           <div style={S.card}>
-            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 24, fontFamily: "'Syne', sans-serif" }}>01 — Pipeline</div>
+            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 24, fontFamily: "'Google Sans', sans-serif" }}>01 — Pipeline</div>
             {applications.length === 0 ? (
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
                 <p style={{ fontSize: 13, color: '#C0C0C0' }}>Sin solicitudes aun</p>
@@ -129,14 +129,14 @@ export default function BancoPage() {
                       style={{ padding: '20px 0', borderBottom: '1px solid #F5F5F3', cursor: isPending ? 'pointer' : 'default', opacity: isPending ? 1 : 0.4, background: isSelected ? '#F5F5F3' : 'transparent', paddingLeft: isSelected ? 16 : 0, paddingRight: isSelected ? 16 : 0, transition: 'all 0.15s' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <p style={{ fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{app.company_name}</p>
+                          <p style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{app.company_name}</p>
                           <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#909090' }}>
                             <span>{app.tax_id || 'Sin RFC'}</span>
                             <span>${Number(app.requested_amount).toLocaleString()}</span>
                           </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          {score !== undefined && <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{score}</div>}
+                          {score !== undefined && <div style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{score}</div>}
                           <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: badge.color, border: '1px solid #E0E0E0', padding: '2px 8px' }}>{badge.label}</span>
                         </div>
                       </div>
@@ -147,7 +147,7 @@ export default function BancoPage() {
             )}
           </div>
           <div style={S.card}>
-            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 24, fontFamily: "'Syne', sans-serif" }}>02 — Decision</div>
+            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#C0C0C0', marginBottom: 24, fontFamily: "'Google Sans', sans-serif" }}>02 — Decision</div>
             {!selected ? (
               <div style={{ padding: '80px 0', textAlign: 'center' }}>
                 <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#E0E0E0' }}>Selecciona una solicitud</div>
@@ -155,14 +155,14 @@ export default function BancoPage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 <div>
-                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: -0.5, marginBottom: 4 }}>{selected.company_name}</h3>
+                  <h3 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: -0.5, marginBottom: 4 }}>{selected.company_name}</h3>
                   <p style={{ fontSize: 12, color: '#909090' }}>{selected.tax_id} · ${Number(selected.requested_amount).toLocaleString()} solicitados</p>
                 </div>
                 {selected.scoring_results?.[0] && (
                   <div style={{ border: '1px solid #E0E0E0', padding: 24 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                       <span style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#909090' }}>Score crediticio</span>
-                      <span style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 700 }}>{selected.scoring_results[0].total_score}/100</span>
+                      <span style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 28, fontWeight: 700 }}>{selected.scoring_results[0].total_score}/100</span>
                     </div>
                     {[
                       { label: 'Ingresos vs monto', score: selected.scoring_results[0].revenue_score, max: 40 },
@@ -173,7 +173,7 @@ export default function BancoPage() {
                       <div key={item.label} style={{ marginBottom: 12 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
                           <span style={{ color: '#909090', textTransform: 'uppercase', letterSpacing: 1 }}>{item.label}</span>
-                          <span style={{ fontFamily: 'monospace' }}>{item.score}/{item.max}</span>
+                          <span style={{ fontFamily: "'Google Sans', sans-serif" }}>{item.score}/{item.max}</span>
                         </div>
                         <div style={{ width: '100%', background: '#F0F0F0', height: 2 }}>
                           <div style={{ height: 2, background: '#000', width: `${(item.score / item.max) * 100}%` }} />
@@ -192,16 +192,16 @@ export default function BancoPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   <button onClick={() => handleDecision('APPROVED')} disabled={submitting}
-                    style={{ background: '#000', color: '#fff', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+                    style={{ background: '#000', color: '#fff', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
                     Aprobar
                   </button>
                   <button onClick={() => handleDecision('REJECTED')} disabled={submitting}
-                    style={{ background: '#fff', color: '#909090', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+                    style={{ background: '#fff', color: '#909090', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
                     Rechazar
                   </button>
                 </div>
                 <button onClick={() => handleDecision('MORE_INFO')} disabled={submitting}
-                  style={{ background: '#fff', color: '#C0C0C0', padding: '12px', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+                  style={{ background: '#fff', color: '#C0C0C0', padding: '12px', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
                   Solicitar mas informacion
                 </button>
               </div>

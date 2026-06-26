@@ -1,4 +1,5 @@
 'use client'
+import Logo from '../../../components/Logo';
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -53,12 +54,12 @@ export default function NuevaFactura() {
 
   if (success && datos) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'DM Sans', sans-serif" }}>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+      <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Google Sans', sans-serif" }}>
+        
         <div style={{ width: '100%', maxWidth: 520 }}>
           <div style={{ background: '#fff', border: '1px solid #E0E0E0', padding: 48 }}>
             <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090', marginBottom: 16 }}>Factura procesada</div>
-            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 32 }}>Cargada con éxito</h2>
+            <h2 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 32 }}>Cargada con éxito</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: '#E0E0E0', marginBottom: 32 }}>
               {[
                 { label: 'N° Factura', value: datos.numero_factura },
@@ -70,7 +71,7 @@ export default function NuevaFactura() {
               ].filter(i => i.value).map(item => (
                 <div key={item.label} style={{ background: '#fff', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: '#909090' }}>{item.label}</span>
-                  <span style={{ fontSize: 14, fontWeight: 500, fontFamily: item.label === 'Monto' ? 'monospace' : 'inherit' }}>{item.value}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, fontFamily: 'inherit' }}>{item.value}</span>
                 </div>
               ))}
             </div>
@@ -79,7 +80,7 @@ export default function NuevaFactura() {
                 Ir al dashboard
               </Link>
               <button onClick={() => { setSuccess(false); setFile(null); setDatos(null) }}
-                style={{ flex: 1, background: '#fff', color: '#909090', padding: '14px', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+                style={{ flex: 1, background: '#fff', color: '#909090', padding: '14px', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
                 Cargar otra
               </button>
             </div>
@@ -90,20 +91,19 @@ export default function NuevaFactura() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+    <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Google Sans', sans-serif" }}>
+      
       <div style={{ width: '100%', maxWidth: 520 }}>
         <div style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: '#000' }}>
-            <div style={{ width: 32, height: 32, border: '1.5px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 13 }}>SK</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 3, textTransform: 'uppercase' }}>Smart Kapital</span>
+          <Link href={process.env.NEXT_PUBLIC_LANDING_URL || "/"} style={{ textDecoration: 'none' }}>
+            <Logo />
           </Link>
           <Link href="/dashboard" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>← Dashboard</Link>
         </div>
 
         <div style={{ background: '#fff', border: '1px solid #E0E0E0', padding: 48 }}>
           <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090', marginBottom: 16 }}>Proveedor</div>
-          <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 8 }}>Cargar factura</h1>
+          <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: -1, marginBottom: 8 }}>Cargar factura</h1>
           <p style={{ fontSize: 13, color: '#909090', marginBottom: 40 }}>XML, PDF o JSON · México y Costa Rica · IA extrae los datos automáticamente</p>
 
           <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -118,7 +118,7 @@ export default function NuevaFactura() {
                 onChange={e => setFile(e.target.files?.[0] || null)} />
               {file ? (
                 <div>
-                  <p style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{file.name}</p>
+                  <p style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{file.name}</p>
                   <p style={{ fontSize: 12, color: '#909090' }}>{(file.size / 1024).toFixed(1)} KB</p>
                 </div>
               ) : (
@@ -131,7 +131,7 @@ export default function NuevaFactura() {
             </div>
 
             <button type="submit" disabled={!file || loading}
-              style={{ background: !file || loading ? '#E0E0E0' : '#000', color: !file || loading ? '#909090' : '#fff', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: !file || loading ? 'not-allowed' : 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
+              style={{ background: !file || loading ? '#E0E0E0' : '#000', color: !file || loading ? '#909090' : '#fff', padding: '14px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: !file || loading ? 'not-allowed' : 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
               {loading ? 'Procesando con IA...' : 'Procesar factura'}
             </button>
           </form>
