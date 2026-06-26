@@ -1,25 +1,28 @@
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   background: #F5F5F3;
   color: #000;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Google Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Responsive helpers */
 @media (max-width: 768px) {
+
   /* Headers */
-  header > div {
+  header>div {
     padding: 0 20px !important;
   }
-  
+
   /* Main content */
   main {
     padding: 32px 20px !important;
@@ -60,7 +63,8 @@ body {
     font-size: 12px !important;
   }
 
-  td, th {
+  td,
+  th {
     padding: 10px 16px !important;
   }
 
