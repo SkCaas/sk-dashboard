@@ -1,33 +1,36 @@
 'use client'
 import Logo from '../../components/Logo';
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect } from 'react'
 import Link from 'next/link'
+import { useUser, useClerk } from "@clerk/nextjs";
+import { useQuery, useMutation } from "convex/react";
 
 export default function DashboardPage() {
-  const [profile, setProfile] = useState<any>(null)
-  const [facturas, setFacturas] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
+  
+  // Utilizando strings para evitar errores de tipado hasta que se configuren los workspaces
+  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+  const upsertUser = useMutation("users:upsert" as any);
+  const facturas = useQuery("facturas:getAll" as any, profile ? {} : "skip") || [];
 
   useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { window.location.href = window.location.origin + '/login'; return }
-      const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-      setProfile(prof)
-      const { data: facts } = await supabase.from('facturas').select('*').order('created_at', { ascending: false }).limit(5)
-      setFacturas(facts || [])
-      setLoading(false)
+    if (user && profile === null) {
+      upsertUser({
+        clerkId: user.id,
+        email: user.primaryEmailAddress?.emailAddress || "correo@ejemplo.com",
+        company_name: "Nueva Empresa",
+        role: "PROVEEDOR"
+      });
     }
-    load()
-  }, [])
+  }, [user, profile, upsertUser]);
 
   async function handleLogout() {
-    await supabase.auth.signOut()
+    await signOut();
     window.location.href = window.location.origin + '/login'
   }
 
-  if (loading) return (
+  if (!isLoaded || profile === undefined) return (
     <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Lexend Deca', sans-serif" }}>
       <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
     </div>
@@ -35,9 +38,9 @@ export default function DashboardPage() {
 
   const isCorporativo = profile?.role === 'CORPORATIVO'
   const isBanco = profile?.role === 'BANCO'
-  const totalMonto = facturas.reduce((sum, f) => sum + (Number(f.monto) || 0), 0)
-  const pendientes = facturas.filter(f => f.estado === 'PENDIENTE').length
-  const aprobadas = facturas.filter(f => f.estado === 'APROBADA').length
+  const totalMonto = facturas.reduce((sum: any, f: any) => sum + (Number(f.monto) || 0), 0)
+  const pendientes = facturas.filter((f: any) => f.estado === 'PENDIENTE').length
+  const aprobadas = facturas.filter((f: any) => f.estado === 'APROBADA').length
 
   const stats = isBanco ? [
     { val: facturas.length.toString(), lbl: 'Total solicitudes' },
@@ -127,8 +130,8 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {facturas.map(f => (
-                  <tr key={f.id} style={{ borderBottom: '1px solid #F5F5F3' }}>
+                {facturas.slice(0,5).map((f: any) => (
+                  <tr key={f._id || f.id} style={{ borderBottom: '1px solid #F5F5F3' }}>
                     <td style={{ padding: '16px 32px', fontSize: 14, fontFamily: "'Google Sans', sans-serif", fontWeight: 700 }}>{f.numero_factura}</td>
                     <td style={{ padding: '16px 32px', fontSize: 13, color: '#606060' }}>{f.emisor}</td>
                     <td style={{ padding: '16px 32px', fontSize: 13, fontFamily: "'Google Sans', sans-serif" }}>{f.moneda} {Number(f.monto).toLocaleString()}</td>

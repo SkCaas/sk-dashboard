@@ -1,8 +1,9 @@
 'use client'
 import Logo from '../../components/Logo';
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 import Link from 'next/link'
+import { useUser, useClerk } from "@clerk/nextjs";
+import { useQuery, useMutation } from "convex/react";
 
 const S = {
   page: { minHeight: '100vh', background: '#F5F5F3', fontFamily: "'Google Sans', sans-serif", color: '#000' },
@@ -15,51 +16,39 @@ const S = {
 }
 
 export default function BancoPage() {
-  const [applications, setApplications] = useState<any[]>([])
+  const { user, isLoaded } = useUser();
+  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+  
+  const applications = useQuery("applications:getAllWithDetails" as any) || [];
+  const makeDecision = useMutation("applications:makeBankDecision" as any);
+
   const [selected, setSelected] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
   const [decision, setDecision] = useState({ approved_amount: '', interest_rate: '', term_months: '', notes: '' })
   const [submitting, setSubmitting] = useState(false)
-  const [stats, setStats] = useState({ total: 0, approved: 0, rejected: 0, pending: 0, volume: 0 })
 
-  useEffect(() => { loadData() }, [])
+  const approved = applications.filter((a: any) => a.bank_decisions?.length > 0 && a.bank_decisions[0].decision === 'APPROVED')
+  const rejected = applications.filter((a: any) => a.bank_decisions?.length > 0 && a.bank_decisions[0].decision === 'REJECTED')
+  const pending = applications.filter((a: any) => !a.bank_decisions?.length)
+  const volume = approved.reduce((sum: number, a: any) => sum + (a.bank_decisions[0].approved_amount || 0), 0)
 
-  async function loadData() {
-    const { data: apps } = await supabase.from('credit_applications').select('*, scoring_results(*), bank_decisions(*)').order('created_at', { ascending: false })
-    const list = apps || []
-    setApplications(list)
-    const approved = list.filter((a: any) => a.bank_decisions?.length > 0 && a.bank_decisions[0].decision === 'APPROVED')
-    const rejected = list.filter((a: any) => a.bank_decisions?.length > 0 && a.bank_decisions[0].decision === 'REJECTED')
-    const pending = list.filter((a: any) => !a.bank_decisions?.length)
-    const volume = approved.reduce((sum: number, a: any) => sum + (a.bank_decisions[0].approved_amount || 0), 0)
-    setStats({ total: list.length, approved: approved.length, rejected: rejected.length, pending: pending.length, volume })
-    setLoading(false)
-  }
+  const stats = { total: applications.length, approved: approved.length, rejected: rejected.length, pending: pending.length, volume }
 
   async function handleDecision(dec: string) {
-    if (!selected) return
+    if (!selected || !profile) return
     setSubmitting(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('bank_decisions').insert({
-      application_id: selected.id, bank_user_id: user?.id, decision: dec,
-      approved_amount: dec === 'APPROVED' ? Number(decision.approved_amount) || selected.requested_amount : null,
-      interest_rate: Number(decision.interest_rate) || null,
-      term_months: Number(decision.term_months) || null,
-      notes: decision.notes || null
-    })
-    if (dec === 'APPROVED') {
-      await supabase.from('credit_lines').insert({
-        company_id: selected.applicant_id, application_id: selected.id,
-        total_limit: Number(decision.approved_amount) || selected.requested_amount,
-        available_limit: Number(decision.approved_amount) || selected.requested_amount,
-        interest_rate: Number(decision.interest_rate) || null,
-        term_months: Number(decision.term_months) || null
-      })
-    }
-    await supabase.from('credit_applications').update({ status: dec === 'APPROVED' ? 'APPROVED' : 'REJECTED' }).eq('id', selected.id)
+    
+    await makeDecision({
+      application_id: selected._id,
+      bank_user_id: profile._id,
+      decision: dec,
+      approved_amount: dec === 'APPROVED' ? (Number(decision.approved_amount) || selected.requested_amount) : undefined,
+      interest_rate: Number(decision.interest_rate) || undefined,
+      term_months: Number(decision.term_months) || undefined,
+      notes: decision.notes || undefined
+    });
+    
     setSelected(null)
     setDecision({ approved_amount: '', interest_rate: '', term_months: '', notes: '' })
-    await loadData()
     setSubmitting(false)
   }
 
@@ -71,7 +60,7 @@ export default function BancoPage() {
     return { label: 'MAS INFO', color: '#606060' }
   }
 
-  if (loading) return (
+  if (!isLoaded || profile === undefined) return (
     <div style={{ ...S.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
     </div>
@@ -119,13 +108,13 @@ export default function BancoPage() {
               </div>
             ) : (
               <div>
-                {applications.map(app => {
+                {applications.map((app: any) => {
                   const score = app.scoring_results?.[0]?.total_score
                   const badge = getStatusBadge(app)
-                  const isSelected = selected?.id === app.id
+                  const isSelected = selected?._id === app._id
                   const isPending = !app.bank_decisions?.length
                   return (
-                    <div key={app.id} onClick={() => isPending && setSelected(isSelected ? null : app)}
+                    <div key={app._id} onClick={() => isPending && setSelected(isSelected ? null : app)}
                       style={{ padding: '20px 0', borderBottom: '1px solid #F5F5F3', cursor: isPending ? 'pointer' : 'default', opacity: isPending ? 1 : 0.4, background: isSelected ? '#F5F5F3' : 'transparent', paddingLeft: isSelected ? 16 : 0, paddingRight: isSelected ? 16 : 0, transition: 'all 0.15s' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
@@ -169,7 +158,7 @@ export default function BancoPage() {
                       { label: 'Ratio deuda', score: selected.scoring_results[0].debt_ratio_score, max: 25 },
                       { label: 'Historial pagos', score: selected.scoring_results[0].payment_history_score, max: 25 },
                       { label: 'Anos operacion', score: selected.scoring_results[0].seniority_score, max: 10 },
-                    ].map(item => (
+                    ].map((item: any) => (
                       <div key={item.label} style={{ marginBottom: 12 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
                           <span style={{ color: '#909090', textTransform: 'uppercase', letterSpacing: 1 }}>{item.label}</span>

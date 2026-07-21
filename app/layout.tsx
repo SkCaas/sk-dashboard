@@ -29,6 +29,8 @@ export const metadata: Metadata = {
   },
 }
 
+import ConvexClientProvider from './ConvexClientProvider'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -38,7 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&amp;display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
       </head>
-      <body>{children}</body>
+      <body>
+        <ConvexClientProvider>
+          {children}
+        </ConvexClientProvider>
+      </body>
     </html>
   )
 }

@@ -1,7 +1,8 @@
 'use client'
 import Logo from '../../components/Logo';
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useUser } from "@clerk/nextjs";
+import { useQuery, useMutation } from "convex/react";
 import Link from 'next/link'
 
 const S = {
@@ -20,23 +21,33 @@ export default function ScoringPage() {
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState('')
 
+  const { user, isLoaded } = useUser();
+  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+
+  const createApplication = useMutation("applications:create" as any);
+  const evaluateApplication = useMutation("scoring:evaluate" as any);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
     setResult(null)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('No autenticado')
-      const { data: app, error: appError } = await supabase.from('credit_applications').insert({
-        company_name: form.company_name, tax_id: form.tax_id,
-        annual_revenue: Number(form.annual_revenue), years_in_business: Number(form.years_in_business),
-        existing_debt: Number(form.existing_debt) || 0, requested_amount: Number(form.requested_amount),
-        payment_history_score: Number(form.payment_history_score), applicant_id: user.id
-      }).select().single()
-      if (appError) throw new Error(appError.message)
-      const response = await fetch('/api/scoring/evaluate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ application_id: app.id }) })
-      const scoring = await response.json()
+      if (!profile) throw new Error('No autenticado')
+      
+      const appId = await createApplication({
+        applicant_id: profile._id,
+        company_name: form.company_name,
+        tax_id: form.tax_id,
+        annual_revenue: Number(form.annual_revenue),
+        years_in_business: Number(form.years_in_business),
+        existing_debt: Number(form.existing_debt) || 0,
+        requested_amount: Number(form.requested_amount),
+        payment_history_score: Number(form.payment_history_score)
+      });
+
+      const scoring = await evaluateApplication({ application_id: appId });
+      
       setResult({ ...scoring, company_name: form.company_name })
     } catch (err: any) { setError(err.message) }
     finally { setLoading(false) }
@@ -44,6 +55,12 @@ export default function ScoringPage() {
 
   const getColor = (rec: string) => rec === 'APPROVE' ? '#000' : rec === 'REVIEW' ? '#606060' : '#C0C0C0'
   const getLabel = (rec: string) => rec === 'APPROVE' ? 'APROBAR' : rec === 'REVIEW' ? 'REVISAR' : 'RECHAZAR'
+
+  if (!isLoaded || profile === undefined) return (
+    <div style={{ ...S.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
+    </div>
+  )
 
   return (
     <div style={S.page}>

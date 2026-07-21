@@ -2,7 +2,6 @@
 import Logo from '../../components/Logo';
 import { useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 
 const endpoints = [
   {
@@ -26,16 +25,7 @@ const endpoints = [
   "processing_time_ms": 124
 }`,
     tryIt: async () => {
-      const start = Date.now()
-      const { data: apps } = await supabase.from('credit_applications').select('id').limit(1).single()
-      if (!apps) return { error: 'No applications found. Create one in /scoring first.' }
-      const res = await fetch('/api/scoring/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ application_id: apps.id })
-      })
-      const data = await res.json()
-      return { ...data, _time: Date.now() - start }
+      return { error: 'Migrated to Convex. Endpoint deprecated in dashboard repo.' }
     }
   },
   {
@@ -55,23 +45,7 @@ const endpoints = [
   "created_at": "2026-04-14T10:00:00Z"
 }`,
     tryIt: async () => {
-      const start = Date.now()
-      const { data: apps } = await supabase
-        .from('credit_applications')
-        .select('*, scoring_results(*), bank_decisions(*)')
-        .limit(1)
-        .single()
-      if (!apps) return { error: 'No applications found.' }
-      return {
-        id: apps.id,
-        company_name: apps.company_name,
-        status: apps.status,
-        score: apps.scoring_results?.[0]?.total_score || null,
-        recommendation: apps.scoring_results?.[0]?.recommendation || null,
-        decision: apps.bank_decisions?.[0]?.decision || null,
-        created_at: apps.created_at,
-        _time: Date.now() - start
-      }
+      return { error: 'Migrated to Convex. Endpoint deprecated in dashboard repo.' }
     }
   },
   {
@@ -96,27 +70,7 @@ const endpoints = [
   "next_step": "POST /api/scoring/evaluate"
 }`,
     tryIt: async () => {
-      const start = Date.now()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return { error: 'Not authenticated. Please sign in first.' }
-      const { data, error } = await supabase.from('credit_applications').insert({
-        company_name: 'Textiles del Pacifico S.A.',
-        tax_id: 'TPA850312XY1',
-        annual_revenue: 3500000,
-        requested_amount: 400000,
-        existing_debt: 80000,
-        years_in_business: 8,
-        payment_history_score: 85,
-        applicant_id: user.id
-      }).select().single()
-      if (error) return { error: error.message }
-      return {
-        application_id: data.id,
-        status: data.status,
-        created_at: data.created_at,
-        next_step: 'POST /api/scoring/evaluate',
-        _time: Date.now() - start
-      }
+      return { error: 'Migrated to Convex. Endpoint deprecated in dashboard repo.' }
     }
   },
   {
@@ -141,33 +95,7 @@ const endpoints = [
   "decided_at": "2026-04-14T10:05:00Z"
 }`,
     tryIt: async () => {
-      const start = Date.now()
-      const { data: apps } = await supabase
-        .from('credit_applications')
-        .select('id, requested_amount, applicant_id')
-        .eq('status', 'SCORED')
-        .limit(1)
-        .single()
-      if (!apps) return { error: 'No scored applications found. Run scoring/evaluate first.' }
-      const { data: { user } } = await supabase.auth.getUser()
-      const { data, error } = await supabase.from('bank_decisions').insert({
-        application_id: apps.id,
-        bank_user_id: user?.id,
-        decision: 'APPROVED',
-        approved_amount: apps.requested_amount * 0.95,
-        interest_rate: 12.5,
-        term_months: 12,
-        notes: 'API sandbox approval'
-      }).select().single()
-      if (error) return { error: error.message }
-      return {
-        decision: 'APPROVED',
-        approved_amount: apps.requested_amount * 0.95,
-        interest_rate: 12.5,
-        term_months: 12,
-        decided_at: data.decided_at,
-        _time: Date.now() - start
-      }
+      return { error: 'Migrated to Convex. Endpoint deprecated in dashboard repo.' }
     }
   },
   {
@@ -189,26 +117,7 @@ const endpoints = [
   "status": "ACTIVE"
 }`,
     tryIt: async () => {
-      const start = Date.now()
-      const { data, error } = await supabase
-        .from('credit_lines')
-        .select('*, credit_applications(company_name)')
-        .eq('status', 'ACTIVE')
-        .limit(1)
-        .single()
-      if (error || !data) return { error: 'No active credit lines found. Approve an application first.' }
-      return {
-        credit_line_id: data.id,
-        company_name: (data as any).credit_applications?.company_name,
-        total_limit: data.total_limit,
-        available_limit: data.available_limit,
-        used_amount: data.used_amount,
-        utilization_rate: `${((data.used_amount / data.total_limit) * 100).toFixed(1)}%`,
-        interest_rate: data.interest_rate,
-        term_months: data.term_months,
-        status: data.status,
-        _time: Date.now() - start
-      }
+      return { error: 'Migrated to Convex. Endpoint deprecated in dashboard repo.' }
     }
   }
 ]

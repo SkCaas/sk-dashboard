@@ -1,7 +1,8 @@
 'use client'
 import Logo from '../../../components/Logo';
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useUser } from "@clerk/nextjs";
+import { useQuery, useMutation, useAction } from "convex/react";
 import Link from 'next/link'
 
 export default function NuevaFactura() {
@@ -11,6 +12,11 @@ export default function NuevaFactura() {
   const [success, setSuccess] = useState(false)
   const [datos, setDatos] = useState<any>(null)
 
+  const { user } = useUser();
+  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+  const generateUploadUrl = useMutation("facturas:generateUploadUrl" as any);
+  const procesarFactura = useAction("ia:procesarFactura" as any);
+
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault()
     if (!file) return
@@ -18,31 +24,29 @@ export default function NuevaFactura() {
     setError('')
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('No autenticado')
-      const texto = await file.text()
-      const response = await fetch('/api/extraer-factura', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contenido: texto, tipo: file.type, nombre: file.name })
-      })
-      if (!response.ok) throw new Error('Error al procesar con IA')
-      const datosExtraidos = await response.json()
-      const { error: dbError } = await supabase.from('facturas').insert({
-        proveedor_id: user.id,
-        numero_factura: datosExtraidos.numero_factura || 'N/A',
-        emisor: datosExtraidos.emisor || 'N/A',
-        receptor: datosExtraidos.receptor || 'N/A',
-        monto: Number(datosExtraidos.monto) || 0,
-        moneda: datosExtraidos.moneda || 'MXN',
-        fecha_emision: datosExtraidos.fecha_emision || null,
-        fecha_vencimiento: datosExtraidos.fecha_vencimiento || null,
-        pais: datosExtraidos.pais || 'N/A',
-        tipo_archivo: file.type,
-        datos_extraidos: datosExtraidos,
-        estado: 'PENDIENTE'
-      })
-      if (dbError) throw new Error(dbError.message)
+      if (!profile) throw new Error('No autenticado')
+      
+      // 1. Obtener URL de Convex Storage
+      const postUrl = await generateUploadUrl();
+
+      // 2. Subir el archivo a Convex
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type || "application/pdf" },
+        body: file,
+      });
+      if (!result.ok) throw new Error('Error al subir archivo')
+      
+      const { storageId } = await result.json();
+
+      // 3. Ejecutar la acción de IA en el backend (gemini-1.5-pro configurado via vars)
+      const datosExtraidos = await procesarFactura({
+        storageId,
+        userId: profile._id,
+        fileName: file.name,
+        mimeType: file.type || "application/pdf"
+      });
+
       setDatos(datosExtraidos)
       setSuccess(true)
     } catch (err: any) {
