@@ -2,9 +2,18 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher(['/login(.*)', '/register(.*)']);
 
+import { NextResponse } from "next/server";
+
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
-    await auth.protect();
+    const authObj = await auth();
+    authObj.protect();
+
+    // If the user is logged in, has no active organization, and is not on the onboarding page, redirect to onboarding.
+    if (authObj.userId && !authObj.orgId && req.nextUrl.pathname !== '/onboarding') {
+      const orgSelection = new URL('/onboarding', req.url);
+      return NextResponse.redirect(orgSelection);
+    }
   }
 });
 
