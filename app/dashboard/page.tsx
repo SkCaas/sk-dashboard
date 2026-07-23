@@ -66,7 +66,7 @@ export default function DashboardPage() {
             <Logo />
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <OrganizationSwitcher hidePersonal={true} />
+            <OrganizationSwitcher hidePersonal={true} createOrganizationUrl="/onboarding" />
             <button onClick={handleLogout} style={{ fontSize: 11, color: '#909090', letterSpacing: 1.5, textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>Logout</button>
           </div>
         </div>

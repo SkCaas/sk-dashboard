@@ -16,6 +16,7 @@ export default function OnboardingPage() {
   
   const { setActive } = useOrganizationList();
   const router = useRouter();
+  const [details, setDetails] = useState<any>({});
 
   const handleCreateOrganization = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +32,8 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           name,
           type: selectedType,
-          tax_id: taxId
+          tax_id: details.tax_id || '', // keep top-level for backward compat
+          details: details
         })
       });
 
@@ -41,12 +43,10 @@ export default function OnboardingPage() {
 
       const org = await res.json();
       
-      // Set the newly created organization as active in Clerk
       if (setActive) {
         await setActive({ organization: org.id });
       }
 
-      // Redirect to dashboard
       router.push('/dashboard');
       
     } catch (err: any) {
@@ -83,16 +83,8 @@ export default function OnboardingPage() {
               {(['SUPPLIER', 'CORPORATE', 'BANK'] as EntityType[]).map((type) => (
                 <button
                   key={type}
-                  onClick={() => setSelectedType(type)}
-                  style={{
-                    background: '#fff',
-                    border: '1px solid #E0E0E0',
-                    padding: '32px',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    fontFamily: 'inherit'
-                  }}
+                  onClick={() => { setSelectedType(type); setDetails({}); setName(''); setError(''); }}
+                  style={{ background: '#fff', border: '1px solid #E0E0E0', padding: '32px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}
                   onMouseOver={(e) => (e.currentTarget.style.borderColor = '#000')}
                   onMouseOut={(e) => (e.currentTarget.style.borderColor = '#E0E0E0')}
                 >
@@ -104,16 +96,10 @@ export default function OnboardingPage() {
           </>
         ) : (
           <form onSubmit={handleCreateOrganization} style={{ background: '#fff', border: '1px solid #E0E0E0', padding: '48px' }}>
-            <button 
-              type="button" 
-              onClick={() => setSelectedType(null)}
-              style={{ background: 'none', border: 'none', fontSize: 11, color: '#909090', letterSpacing: 1.5, textTransform: 'uppercase', cursor: 'pointer', padding: 0, marginBottom: 32 }}
-            >
-              ← Back
-            </button>
+            <button type="button" onClick={() => setSelectedType(null)} style={{ background: 'none', border: 'none', fontSize: 11, color: '#909090', letterSpacing: 1.5, textTransform: 'uppercase', cursor: 'pointer', padding: 0, marginBottom: 32 }}>← Back</button>
             
             <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: -0.5, marginBottom: 8 }}>Create {getEntityTitle(selectedType)} Profile</h1>
-            <p style={{ fontSize: 13, color: '#909090', marginBottom: 32 }}>Enter your company details to get started.</p>
+            <p style={{ fontSize: 13, color: '#909090', marginBottom: 32 }}>Enter your unique company details to get started.</p>
 
             {error && (
               <div style={{ background: '#FFF0F0', border: '1px solid #FFCCCC', color: '#CC0000', padding: '16px', fontSize: 13, marginBottom: 24 }}>
@@ -123,44 +109,53 @@ export default function OnboardingPage() {
 
             <div style={{ marginBottom: 24 }}>
               <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Company Name</label>
-              <input 
-                type="text" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
-                placeholder="e.g. Acme Corp"
-              />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. Acme Corp" />
             </div>
 
-            <div style={{ marginBottom: 32 }}>
-              <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Tax ID (Optional)</label>
-              <input 
-                type="text" 
-                value={taxId}
-                onChange={(e) => setTaxId(e.target.value)}
-                style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
-                placeholder="e.g. 123456789"
-              />
-            </div>
+            {selectedType === 'SUPPLIER' && (
+              <>
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Tax ID (Required)</label>
+                  <input type="text" value={details.tax_id || ''} onChange={(e) => setDetails({...details, tax_id: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. 123456789" />
+                </div>
+                <div style={{ marginBottom: 32 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Country</label>
+                  <input type="text" value={details.country || ''} onChange={(e) => setDetails({...details, country: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. Mexico" />
+                </div>
+              </>
+            )}
 
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={{ 
-                width: '100%', 
-                background: '#000', 
-                color: '#fff', 
-                border: 'none', 
-                padding: '16px', 
-                fontSize: 13, 
-                letterSpacing: 2, 
-                textTransform: 'uppercase', 
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1,
-                fontFamily: 'inherit'
-              }}
-            >
+            {selectedType === 'CORPORATE' && (
+              <>
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Corporate Tax ID (Required)</label>
+                  <input type="text" value={details.tax_id || ''} onChange={(e) => setDetails({...details, tax_id: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. C-9876543" />
+                </div>
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Industry Sector</label>
+                  <input type="text" value={details.industry || ''} onChange={(e) => setDetails({...details, industry: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. Manufacturing" />
+                </div>
+                <div style={{ marginBottom: 32 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Estimated Monthly Volume</label>
+                  <input type="text" value={details.monthly_volume || ''} onChange={(e) => setDetails({...details, monthly_volume: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. $500,000" />
+                </div>
+              </>
+            )}
+
+            {selectedType === 'BANK' && (
+              <>
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>Banking License Number (Required)</label>
+                  <input type="text" value={details.banking_license || ''} onChange={(e) => setDetails({...details, banking_license: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. BL-1234" />
+                </div>
+                <div style={{ marginBottom: 32 }}>
+                  <label style={{ display: 'block', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#909090', marginBottom: 8 }}>SWIFT Code</label>
+                  <input type="text" value={details.swift_code || ''} onChange={(e) => setDetails({...details, swift_code: e.target.value})} required style={{ width: '100%', border: '1px solid #E0E0E0', padding: '16px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} placeholder="e.g. BOFAUS3N" />
+                </div>
+              </>
+            )}
+
+            <button type="submit" disabled={loading} style={{ width: '100%', background: '#000', color: '#fff', border: 'none', padding: '16px', fontSize: 13, letterSpacing: 2, textTransform: 'uppercase', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit' }}>
               {loading ? 'Creating...' : 'Continue to Dashboard'}
             </button>
           </form>
