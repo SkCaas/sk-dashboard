@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(['/login(.*)', '/register(.*)']);
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
 
 import { NextResponse } from "next/server";
 
@@ -9,8 +9,13 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect();
     const authObj = await auth();
 
-    // If the user is logged in, has no active organization, and is not on the onboarding page, redirect to onboarding.
-    if (authObj.userId && !authObj.orgId && req.nextUrl.pathname !== '/onboarding') {
+    if (
+      authObj.userId && 
+      !authObj.orgId && 
+      req.nextUrl.pathname !== '/onboarding' && 
+      !req.nextUrl.pathname.startsWith('/api')
+    ) {
+      console.log("Middleware redirecting to onboarding for user", authObj.userId);
       const orgSelection = new URL('/onboarding', req.url);
       return NextResponse.redirect(orgSelection);
     }

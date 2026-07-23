@@ -10,10 +10,11 @@ export default function DashboardPage() {
   
   const company = useQuery("companies:getByClerkOrgId" as any, organization ? { clerkOrgId: organization.id } : "skip");
   const invoices = useQuery("invoices:getByCompanyId" as any, company ? { company_id: company._id } : "skip") || [];
+  const creditLine = useQuery("credit_lines:getByCompanyId" as any, company ? { company_id: company._id } : "skip");
 
   async function handleLogout() {
     await signOut();
-    window.location.href = window.location.origin + '/login'
+    window.location.href = window.location.origin + '/sign-in'
   }
 
   if (!isLoaded || (organization && company === undefined)) return (
@@ -21,6 +22,27 @@ export default function DashboardPage() {
       <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Loading...</p>
     </div>
   )
+
+  // If there's no organization at all, frontend should redirect (fallback for middleware)
+  if (isLoaded && !organization) {
+    if (typeof window !== 'undefined') window.location.href = '/onboarding';
+    return null;
+  }
+
+  // If Clerk has an organization but Convex returned null (db wiped or webhook failed)
+  if (organization && company === null) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Google Sans', sans-serif" }}>
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Synchronization Error</h2>
+        <p style={{ color: '#909090', marginBottom: 24, textAlign: 'center', maxWidth: 400 }}>
+          Your company exists in Clerk but was not found in our database. This usually happens if the database was cleared.
+        </p>
+        <button onClick={async () => { await signOut(); window.location.href = '/sign-in' }} style={{ background: '#000', color: '#fff', padding: '12px 24px', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+          Log Out and Try Again
+        </button>
+      </div>
+    )
+  }
 
   const isCorporate = company?.type === 'CORPORATE'
   const isBank = company?.type === 'BANK'
@@ -37,8 +59,8 @@ export default function DashboardPage() {
   ] : isCorporate ? [
     { val: pendingCount.toString(), lbl: 'Pending Invoices' },
     { val: approvedCount.toString(), lbl: 'Approved' },
-    { val: `$${(totalAmount/1000).toFixed(0)}K`, lbl: 'Total Amount' },
-    { val: invoices.length.toString(), lbl: 'Total Invoices' },
+    { val: creditLine ? `$${(creditLine.available_limit/1000).toFixed(0)}K` : 'Pending', lbl: 'Available Credit' },
+    { val: `$${(totalAmount/1000).toFixed(0)}K`, lbl: 'Invoice Volume' },
   ] : [
     { val: invoices.length.toString(), lbl: 'Uploaded Invoices' },
     { val: pendingCount.toString(), lbl: 'Pending' },

@@ -2,7 +2,7 @@
 import Logo from '../../components/Logo';
 import { useState } from 'react'
 import Link from 'next/link'
-import { useUser, useClerk } from "@clerk/nextjs";
+import { useOrganization, useClerk } from "@clerk/nextjs";
 import { useQuery, useMutation } from "convex/react";
 
 const S = {
@@ -16,8 +16,8 @@ const S = {
 }
 
 export default function BancoPage() {
-  const { user, isLoaded } = useUser();
-  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+  const { organization, isLoaded } = useOrganization();
+  const company = useQuery("companies:getByClerkOrgId" as any, organization ? { clerkOrgId: organization.id } : "skip");
   
   const applications = useQuery("applications:getAllWithDetails" as any) || [];
   const makeDecision = useMutation("applications:makeBankDecision" as any);
@@ -34,13 +34,13 @@ export default function BancoPage() {
   const stats = { total: applications.length, approved: approved.length, rejected: rejected.length, pending: pending.length, volume }
 
   async function handleDecision(dec: string) {
-    if (!selected || !profile) return
+    if (!selected || !company) return
     setSubmitting(true)
     
     await makeDecision({
       application_id: selected._id,
-      bank_user_id: profile._id,
-      decision: dec,
+      bank_company_id: company._id,
+      decision: dec as any,
       approved_amount: dec === 'APPROVED' ? (Number(decision.approved_amount) || selected.requested_amount) : undefined,
       interest_rate: Number(decision.interest_rate) || undefined,
       term_months: Number(decision.term_months) || undefined,
@@ -60,9 +60,17 @@ export default function BancoPage() {
     return { label: 'MAS INFO', color: '#606060' }
   }
 
-  if (!isLoaded || profile === undefined) return (
+  if (!isLoaded || company === undefined) return (
     <div style={{ ...S.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
+    </div>
+  )
+
+  if (company && company.type !== 'BANK') return (
+    <div style={{ ...S.page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 16 }}>Acceso Denegado</h1>
+      <p style={{ fontSize: 14, color: '#909090', marginBottom: 24 }}>Este portal es exclusivo para instituciones financieras.</p>
+      <Link href="/dashboard" style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#000', textDecoration: 'none', border: '1px solid #000', padding: '12px 24px' }}>Volver a mi Dashboard</Link>
     </div>
   )
 
