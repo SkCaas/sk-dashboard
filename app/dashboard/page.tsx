@@ -26,8 +26,7 @@ export default function DashboardPage() {
   }, [user, profile, upsertUser]);
 
   async function handleLogout() {
-    await signOut();
-    window.location.href = window.location.origin + '/login'
+    await signOut({ redirectUrl: '/' });
   }
 
   if (!isLoaded || profile === undefined) return (
