@@ -1,7 +1,7 @@
 'use client'
 import Logo from '../../components/Logo';
 import { useState } from 'react'
-import { useUser } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import { useQuery, useMutation } from "convex/react";
 import Link from 'next/link'
 
@@ -21,8 +21,8 @@ export default function ScoringPage() {
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState('')
 
-  const { user, isLoaded } = useUser();
-  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+  const { organization, isLoaded } = useOrganization();
+  const company = useQuery("companies:getByClerkOrgId" as any, organization ? { clerkOrgId: organization.id } : "skip");
 
   const createApplication = useMutation("applications:create" as any);
   const evaluateApplication = useMutation("scoring:evaluate" as any);
@@ -33,17 +33,16 @@ export default function ScoringPage() {
     setError('')
     setResult(null)
     try {
-      if (!profile) throw new Error('No autenticado')
+      if (!company) throw new Error('No se encontró la empresa (No autenticado)')
       
       const appId = await createApplication({
-        applicant_id: profile._id,
-        company_name: form.company_name,
-        tax_id: form.tax_id,
-        annual_revenue: Number(form.annual_revenue),
-        years_in_business: Number(form.years_in_business),
-        existing_debt: Number(form.existing_debt) || 0,
+        company_id: company._id,
+        tax_id: form.tax_id || company.tax_id || "NOT-PROVIDED",
         requested_amount: Number(form.requested_amount),
-        payment_history_score: Number(form.payment_history_score)
+        annual_revenue: Number(form.annual_revenue),
+        existing_debt: Number(form.existing_debt) || 0,
+        payment_history_score: Number(form.payment_history_score),
+        years_in_business: Number(form.years_in_business),
       });
 
       const scoring = await evaluateApplication({ application_id: appId });
@@ -56,7 +55,7 @@ export default function ScoringPage() {
   const getColor = (rec: string) => rec === 'APPROVE' ? '#000' : rec === 'REVIEW' ? '#606060' : '#C0C0C0'
   const getLabel = (rec: string) => rec === 'APPROVE' ? 'APROBAR' : rec === 'REVIEW' ? 'REVISAR' : 'RECHAZAR'
 
-  if (!isLoaded || profile === undefined) return (
+  if (!isLoaded || company === undefined) return (
     <div style={{ ...S.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
     </div>
@@ -71,7 +70,6 @@ export default function ScoringPage() {
             <Logo />
           </a>
           <div style={{ display: 'flex', gap: 24 }}>
-            <Link href="/banco" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>Portal Banco</Link>
             <Link href="/dashboard" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>Dashboard</Link>
           </div>
         </div>
@@ -144,9 +142,6 @@ export default function ScoringPage() {
                       </div>
                     </div>
                   ))}
-                </div>
-                <div style={{ borderTop: '1px solid #E0E0E0', paddingTop: 24 }}>
-                  <Link href="/banco" style={{ display: 'block', textAlign: 'center', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#909090', textDecoration: 'none', border: '1px solid #E0E0E0', padding: '12px' }}>Ver en portal banco →</Link>
                 </div>
               </div>
             )}

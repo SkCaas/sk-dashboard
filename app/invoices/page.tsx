@@ -1,31 +1,30 @@
 'use client'
 import Logo from '../../components/Logo';
-import { useUser } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import { useQuery, useMutation } from "convex/react";
 import Link from 'next/link'
 
-export default function FacturasPage() {
-  const { user, isLoaded } = useUser();
-  const profile = useQuery("users:getByClerkId" as any, user ? { clerkId: user.id } : "skip");
+export default function InvoicesPage() {
+  const { organization, isLoaded } = useOrganization();
+  const company = useQuery("companies:getByClerkOrgId" as any, organization ? { clerkOrgId: organization.id } : "skip");
   
-  const facturas = useQuery("facturas:getAll" as any) || [];
-  const updateEstado = useMutation("facturas:updateEstado" as any);
+  const allInvoices = useQuery("invoices:getAll" as any) || [];
+  const updateStatus = useMutation("invoices:updateStatus" as any);
 
-  async function cambiarEstado(id: string, estado: string) {
-    await updateEstado({ id, estado });
+  async function changeStatus(id: string, status: string) {
+    await updateStatus({ id, status });
   }
 
-  if (!isLoaded || profile === undefined) return (
+  if (!isLoaded || (organization && company === undefined)) return (
     <div style={{ minHeight: '100vh', background: '#F5F5F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Google Sans', sans-serif" }}>
-      <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Cargando...</p>
+      <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090' }}>Loading...</p>
     </div>
   )
 
-  const isCorporativo = profile?.role === 'CORPORATIVO'
+  const isCorporate = company?.type === 'CORPORATE';
 
-  // Si no es corporativo, solo debería ver sus facturas. 
-  // Para simplificar, asumimos que "facturas" ya vienen filtradas por la query o filtramos acá:
-  const misFacturas = isCorporativo ? facturas : facturas.filter((f: any) => f.user_id === profile._id);
+  // If not corporate, only see their own invoices.
+  const myInvoices = isCorporate ? allInvoices : allInvoices.filter((f: any) => f.company_id === company?._id);
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F5F3', fontFamily: "'Google Sans', sans-serif", color: '#000' }}>
@@ -37,8 +36,8 @@ export default function FacturasPage() {
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
             <Link href="/dashboard" style={{ fontSize: 11, color: '#909090', textDecoration: 'none', letterSpacing: 1.5, textTransform: 'uppercase' }}>Dashboard</Link>
-            {!isCorporativo && (
-              <Link href="/facturas/nueva" style={{ background: '#000', color: '#fff', padding: '8px 20px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', textDecoration: 'none' }}>+ Nueva factura</Link>
+            {!isCorporate && (
+              <Link href="/invoices/nueva" style={{ background: '#000', color: '#fff', padding: '8px 20px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', textDecoration: 'none' }}>+ New Invoice</Link>
             )}
           </div>
         </div>
@@ -46,48 +45,48 @@ export default function FacturasPage() {
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 40px' }}>
         <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#909090', marginBottom: 12 }}>
-          {isCorporativo ? 'Facturas para aprobar' : 'Mis facturas'}
+          {isCorporate ? 'Invoices to approve' : 'My Invoices'}
         </div>
         <h1 style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 32, fontWeight: 700, letterSpacing: -1, marginBottom: 48 }}>
-          {isCorporativo ? 'Pipeline de facturas' : 'Mis facturas'}
+          {isCorporate ? 'Invoice Pipeline' : 'My Invoices'}
         </h1>
 
-        {misFacturas.length === 0 ? (
+        {myInvoices.length === 0 ? (
           <div style={{ background: '#fff', border: '1px solid #E0E0E0', padding: '80px 40px', textAlign: 'center' }}>
-            <p style={{ fontSize: 13, color: '#C0C0C0', marginBottom: 24 }}>No hay facturas aún</p>
-            {!isCorporativo && (
-              <Link href="/facturas/nueva" style={{ display: 'inline-block', background: '#000', color: '#fff', padding: '12px 32px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', textDecoration: 'none' }}>
-                Cargar primera factura
+            <p style={{ fontSize: 13, color: '#C0C0C0', marginBottom: 24 }}>No invoices yet</p>
+            {!isCorporate && (
+              <Link href="/invoices/nueva" style={{ display: 'inline-block', background: '#000', color: '#fff', padding: '12px 32px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', textDecoration: 'none' }}>
+                Upload First Invoice
               </Link>
             )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: '#E0E0E0', border: '1px solid #E0E0E0' }}>
-            {misFacturas.map((f: any) => (
+            {myInvoices.map((f: any) => (
               <div key={f._id} style={{ background: '#fff', padding: '28px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-                    <p style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 16, fontWeight: 700, letterSpacing: -0.5 }}>{f.numero_factura}</p>
-                    <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', border: '1px solid #E0E0E0', padding: '3px 8px', color: f.estado === 'PENDIENTE' ? '#909090' : f.estado === 'APROBADA' ? '#000' : '#C0C0C0' }}>
-                      {f.estado}
+                    <p style={{ fontFamily: "'Google Sans', sans-serif", fontSize: 16, fontWeight: 700, letterSpacing: -0.5 }}>{f.invoice_number}</p>
+                    <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', border: '1px solid #E0E0E0', padding: '3px 8px', color: f.status === 'PENDING' ? '#909090' : f.status === 'APPROVED' ? '#000' : '#C0C0C0' }}>
+                      {f.status}
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: 32, fontSize: 13, color: '#909090' }}>
-                    <span>{f.emisor}</span>
-                    <span>→ {f.receptor || 'Empresa'}</span>
-                    <span style={{ fontFamily: "'Google Sans', sans-serif", color: '#000', fontWeight: 500 }}>{f.moneda} {Number(f.monto).toLocaleString()}</span>
-                    <span>{f.fecha_emision || 'Sin fecha'}</span>
+                    <span>{f.issuer}</span>
+                    <span>→ {f.receiver || 'Company'}</span>
+                    <span style={{ fontFamily: "'Google Sans', sans-serif", color: '#000', fontWeight: 500 }}>{f.currency} {Number(f.amount).toLocaleString()}</span>
+                    <span>{f.issue_date || 'No Date'}</span>
                   </div>
                 </div>
-                {isCorporativo && f.estado === 'PENDIENTE' && (
+                {isCorporate && f.status === 'PENDING' && (
                   <div style={{ display: 'flex', gap: 8, marginLeft: 32 }}>
-                    <button onClick={() => cambiarEstado(f._id, 'APROBADA')}
+                    <button onClick={() => changeStatus(f._id, 'APPROVED')}
                       style={{ background: '#000', color: '#fff', padding: '10px 20px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: 'none', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
-                      Aprobar
+                      Approve
                     </button>
-                    <button onClick={() => cambiarEstado(f._id, 'RECHAZADA')}
+                    <button onClick={() => changeStatus(f._id, 'REJECTED')}
                       style={{ background: '#fff', color: '#909090', padding: '10px 20px', fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', border: '1px solid #E0E0E0', cursor: 'pointer', fontFamily: "'Google Sans', sans-serif" }}>
-                      Rechazar
+                      Reject
                     </button>
                   </div>
                 )}

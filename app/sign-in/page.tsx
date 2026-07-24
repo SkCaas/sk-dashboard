@@ -17,7 +17,7 @@ export default function LoginPage() {
         <div style={{ fontSize: 11, color: '#272727', letterSpacing: 1 }}>© 2026 SK. All rights reserved.</div>
       </div>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
-        <SignIn routing="hash" />
+        <SignIn routing="hash" signUpUrl="/sign-up" />
       </div>
     </div>
   )
